@@ -24,7 +24,7 @@ def main():
     #Create the output files
     create_simulated_fastqs(refence_sequence, qual_string_1, qual_string_2)
     
-# Creates fastq files
+# Creates fastq files with deletions for each base pair
 def create_simulated_fastqs_deletion(sequence, quality_forward, quality_backward):
     #Create forward and backward sequences with slicing. Backward sequence is reversed with slicing.
     with open('single_deletion_forward.fastq', "w") as f1:
