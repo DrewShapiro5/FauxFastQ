@@ -2,11 +2,12 @@ import random
 
 class Fqeditor:
 
-    def __init__(self, seed: int, unidirectional: bool = False):
+    def __init__(self, seed: int, unidirectional: bool = False, file_mode: str = 'w'):
         self.header_str = "@M05774:236:000000000-LKC5Y:1:1107:27241:{index} {dir}:N:0:GATCAGAT+TCCGCGAA"
         self._random = random.Random()
         self._random.seed(seed)
         self.unidirectional = unidirectional
+        self.file_mode = file_mode
 
     # Creates fastq files with deletions for each base pair
     def create_simulated_fastqs_deletion(self, sequence, quality_forward, quality_reverse, edit_len, file_forward, file_reverse):
@@ -70,7 +71,7 @@ class Fqeditor:
                             file_forward,
                             file_reverse,
                             edit_func=single_pair_insertion,
-                            iter_len=len(sequence) - edit_len,
+                            iter_len=len(sequence) - 1,
                             edit_len=edit_len)
 
         """
@@ -103,10 +104,10 @@ class Fqeditor:
         # Determine output files based on unidirectional setting
         output_files = []
         if self.unidirectional:
-            output_files.append(open(file_forward, 'w'))
+            output_files.append(open(file_forward, self.file_mode))
         else:
-            output_files.append(open(file_forward, 'w'))
-            output_files.append(open(file_reverse, 'w'))
+            output_files.append(open(file_forward, self.file_mode))
+            output_files.append(open(file_reverse, self.file_mode))
 
         for index in range(iter_len):
             # Generate headers
@@ -133,14 +134,14 @@ class Fqeditor:
             f.close()
 
 # Replaces the base pair at index 'index' with a random base pair
-def single_pair_swap(sequence, index, r: random.Random):
+def single_pair_swap(sequence, index, edit_len, r: random.Random):
     complement = dna_complement(sequence[index])
     list_sequence = list(sequence)
     list_sequence[index] = complement
     return ''.join(list_sequence)
 
 # Inserts the complement of the pair at index 'index' after the pair
-def single_pair_insertion(sequence, index, r: random.Random):
+def single_pair_insertion(sequence, index, edit_len, r: random.Random):
     complement = dna_complement(sequence[index])
     list_sequence = list(sequence)
     list_sequence.insert(index + 1, complement)
