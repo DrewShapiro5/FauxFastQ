@@ -48,9 +48,3 @@ def get_average_quality(file_path):
         quality_score_string += quality_chars[round(val)]
 
     return quality_score_string
-
-if (__name__=='__main__'):
-    file_path = 'reference_reads_compressed/read1.fastq.gz'
-    if len(sys.argv) > 1:
-        file_path = sys.argv[1]
-    print(f'Average quality of {file_path}: {get_average_quality(file_path)}')
