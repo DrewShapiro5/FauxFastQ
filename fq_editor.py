@@ -8,6 +8,7 @@ class Fqeditor:
         self._random.seed(seed)
         self.unidirectional = unidirectional
         self.file_mode = file_mode
+        self.total_reads = 0
 
     # Creates fastq files with deletions for each base pair
     def create_simulated_fastqs_deletion(self, sequence, quality_forward, quality_reverse, edit_len, file_forward, file_reverse):
@@ -20,22 +21,6 @@ class Fqeditor:
                             iter_len=len(sequence) - edit_len,
                             edit_len=edit_len)
 
-        """
-        with open('single_deletion_forward.fastq', "w") as f1:
-            with open('single_deletion_reverse.fastq', "w") as f2:
-                for index in range(len(sequence) - edit_len):
-                    header_forward = self.header_str.format(index=index, dir=1)
-                    header_reverse = self.header_str.format(index=index, dir=2)
-                    edited_sequence = sequence[:index] + sequence[index + edit_len:]
-                    #Create forward and backward sequences with slicing. Backward sequence is reversed with slicing.
-                    sequence_forward = edited_sequence[:len(quality_forward)]
-                    sequence_reverse = edited_sequence[-len(quality_reverse):][::-1]
-
-                    #Write the contents to the appropriate files
-                    f1.write(f'{header_forward}\n{sequence_forward}\n+\n{quality_forward}\n')
-                    f2.write(f'{header_reverse}\n{dna_complement(sequence_reverse)}\n+\n{quality_reverse}\n')
-            """
-
     # Creates fastq files with replacements for each base pair
     def create_simulated_fastqs_replacement(self, sequence, quality_forward, quality_reverse, edit_len, file_forward, file_reverse):
         self._process_edits(sequence,
@@ -47,22 +32,6 @@ class Fqeditor:
                             iter_len=len(sequence) - edit_len,
                             edit_len=edit_len)
 
-        """
-        with open('single_swap_forward.fastq', "w") as f1:
-            with open('single_swap_reverse.fastq', "w") as f2:
-                for index in range(len(sequence) - 1):
-                    header_forward = self.header_str.format(index=index, dir=1)
-                    header_reverse = self.header_str.format(index=index, dir=2)
-                    edited_sequence = single_pair_swap(sequence, index)
-                    #Create forward and backward sequences with slicing. Backward sequence is reversed with slicing.
-                    sequence_forward = edited_sequence[:len(quality_forward)]
-                    sequence_reverse = edited_sequence[-len(quality_reverse):][::-1]
-
-                    #Write the contents to the appropriate files
-                    f1.write(f'{header_forward}\n{sequence_forward}\n+\n{quality_forward}\n')
-                    f2.write(f'{header_reverse}\n{dna_complement(sequence_reverse)}\n+\n{quality_reverse}\n')
-                    """
-
     # Creates fastq files with insertions between each pair of base pairs
     def create_simulated_fastqs_insertion(self, sequence, quality_forward, quality_reverse, edit_len, file_forward, file_reverse):
         self._process_edits(sequence,
@@ -73,23 +42,6 @@ class Fqeditor:
                             edit_func=single_pair_insertion,
                             iter_len=len(sequence) - 1,
                             edit_len=edit_len)
-
-        """
-        with open('single_insertion_forward.fastq', "w") as f1:
-            with open('single_insertion_reverse.fastq', "w") as f2:
-                for index in range(len(sequence) - 1):
-                    header_forward = self.header_str.format(index=index, dir=1)
-                    header_reverse = self.header_str.format(index=index, dir=2)
-                    edited_sequence = single_pair_insertion(sequence, index)
-                    #Create forward and backward sequences with slicing. Backward sequence is reversed with slicing.
-                    sequence_forward = edited_sequence[:len(quality_forward)]
-                    sequence_reverse = edited_sequence[-len(quality_reverse):][::-1]
-
-                    #Write the contents to the appropriate files
-                    f1.write(f'{header_forward}\n{sequence_forward}\n+\n{quality_forward}\n')
-                    f2.write(f'{header_reverse}\n{dna_complement(sequence_reverse)}\n+\n{quality_reverse}\n')
-                    """
-
 
     def _process_edits(self, sequence, quality_forward, quality_reverse,
                        file_forward, file_reverse,
@@ -111,8 +63,8 @@ class Fqeditor:
 
         for index in range(iter_len):
             # Generate headers
-            header_forward = self.header_str.format(index=index, dir=1)
-            header_reverse = self.header_str.format(index=index, dir=2)
+            header_forward = self.header_str.format(index=index+self.total_reads, dir=1)
+            header_reverse = self.header_str.format(index=index+self.total_reads, dir=2)
 
             # Apply the edit
             edited_sequence = edit_func(sequence, index, edit_len, self._random)
@@ -132,6 +84,7 @@ class Fqeditor:
         # Ensure files are closed
         for f in output_files:
             f.close()
+        self.total_reads += iter_len
 
 # Replaces the base pair at index 'index' with a random base pair
 def single_pair_swap(sequence, index, edit_len, r: random.Random):
