@@ -2,7 +2,7 @@ import pyfastx
 import random
 import sys
 
-def get_average_quality(file_path):
+def get_average_quality(file_path, sample_size):
     fa = pyfastx.Fastq(file_path)
     reads_count = len(fa)
     print('Average quality score outputs:')
@@ -14,7 +14,7 @@ def get_average_quality(file_path):
     print(f'min length: {fa.minlen}')
     print(f'max length: {fa.maxlen}')
     read_length = fa.minlen
-    sample_size = 500
+    sample_size = min(sample_size, reads_count)
     sample_indices = []
 
     #Create a list of random indices
