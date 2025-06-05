@@ -2,49 +2,44 @@ import random
 
 class Fqeditor:
 
-    def __init__(self, seed: int, unidirectional: bool = False, file_mode: str = 'w'):
+    def __init__(self, seed: int, file_forward, file_reverse, unidirectional: bool = False, file_mode: str = 'w'):
         self.header_str = "@M05774:236:000000000-LKC5Y:1:1107:27241:{index} {dir}:N:0:GATCAGAT+TCCGCGAA"
         self._random = random.Random()
         self._random.seed(seed)
         self.unidirectional = unidirectional
         self.file_mode = file_mode
         self.total_reads = 0
+        self.file_forward = file_forward
+        self.file_reverse = file_reverse
 
     # Creates fastq files with deletions for each base pair
-    def create_simulated_fastqs_deletion(self, sequence, quality_forward, quality_reverse, edit_len, file_forward, file_reverse):
+    def create_simulated_fastqs_deletion(self, sequence, quality_forward, quality_reverse, edit_len):
         self._process_edits(sequence,
                             quality_forward,
                             quality_reverse,
-                            file_forward,
-                            file_reverse,
                             edit_func=lambda seq, idx, l, r: seq[:idx] + seq[idx + l:],
                             iter_len=len(sequence) - edit_len,
                             edit_len=edit_len)
 
     # Creates fastq files with replacements for each base pair
-    def create_simulated_fastqs_replacement(self, sequence, quality_forward, quality_reverse, edit_len, file_forward, file_reverse):
+    def create_simulated_fastqs_replacement(self, sequence, quality_forward, quality_reverse, edit_len):
         self._process_edits(sequence,
                             quality_forward,
                             quality_reverse,
-                            file_forward,
-                            file_reverse,
                             edit_func=single_pair_swap,
                             iter_len=len(sequence) - edit_len,
                             edit_len=edit_len)
 
     # Creates fastq files with insertions between each pair of base pairs
-    def create_simulated_fastqs_insertion(self, sequence, quality_forward, quality_reverse, edit_len, file_forward, file_reverse):
+    def create_simulated_fastqs_insertion(self, sequence, quality_forward, quality_reverse, edit_len):
         self._process_edits(sequence,
                             quality_forward,
                             quality_reverse,
-                            file_forward,
-                            file_reverse,
                             edit_func=single_pair_insertion,
                             iter_len=len(sequence) - 1,
                             edit_len=edit_len)
 
     def _process_edits(self, sequence, quality_forward, quality_reverse,
-                       file_forward, file_reverse,
                        edit_func, iter_len, edit_len=1):
         """
         Driver method for creating edited FASTQ files.
@@ -56,10 +51,10 @@ class Fqeditor:
         # Determine output files based on unidirectional setting
         output_files = []
         if self.unidirectional:
-            output_files.append(open(file_forward, self.file_mode))
+            output_files.append(open(self.file_forward, self.file_mode))
         else:
-            output_files.append(open(file_forward, self.file_mode))
-            output_files.append(open(file_reverse, self.file_mode))
+            output_files.append(open(self.file_forward, self.file_mode))
+            output_files.append(open(self.file_reverse, self.file_mode))
 
         for index in range(iter_len):
             # Generate headers
