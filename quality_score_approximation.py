@@ -5,7 +5,7 @@ import sys
 def get_average_quality(file_path, sample_size):
     fa = pyfastx.Fastq(file_path)
     reads_count = len(fa)
-    print('Average quality score outputs:')
+    print(file_path + ':')
     
     print(f'reads: {reads_count}')
 
