@@ -3,7 +3,7 @@ import random
 class FQEditor:
 
     def __init__(self, seed: int, file_forward, file_reverse, unidirectional: bool = False, file_mode: str = 'w', preserve_case: bool = False, use_random_bases: bool = False):
-        self._header_str = "@M05774:236:000000000-LKC5Y:1:1107:27241:{index} {dir}:N:0:GATCAGAT+TCCGCGAA"
+        self._header_str = "@M0577{edit_len}:236:000000000-LKC5Y:1:1107:27241:{index} {dir}:N:0:GATCAGAT+TCCGCGAA"
         self._random = random.Random()
         self._random.seed(seed)
         self._unidirectional = unidirectional
@@ -61,13 +61,13 @@ class FQEditor:
 
         for index in range(iter_len):
             # Generate headers
-            header_forward = self._header_str.format(index=index + self._total_reads, dir=1)
-            header_reverse = self._header_str.format(index=index + self._total_reads, dir=2)
+            header_forward = self._header_str.format(edit_len=edit_len, index=index + self._total_reads, dir=1)
+            header_reverse = self._header_str.format(edit_len=edit_len, index=index + self._total_reads, dir=2)
 
             # Apply the edit
             edited_sequence = edit_func(sequence, index, edit_len)
 
-            # Create forward and backward sequences with slicing. Backward sequence is reversed with slicing.
+            # Create forward and backward sequences with slicing. Reverse sequence is reversed with slicing.
             sequence_forward = edited_sequence[:len(quality_forward)]
             sequence_reverse = edited_sequence[-len(quality_reverse):][::-1]
 
