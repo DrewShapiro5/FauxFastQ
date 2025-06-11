@@ -21,7 +21,7 @@ parser.add_argument('-i', '--insertion', action='store_true', help="Insertion mo
 parser.add_argument('-r', '--replacement', action='store_true', help="Replacement mode")
 parser.add_argument('--append', action='store_true', help="For use with multiple editing modes. Creates a fasta/q file with edits of each specified mode.")
 parser.add_argument('--sample_size', type=int, default=500, help="Sample size for quality sampling from reference files")
-parser.add_argument('--use_quality', type=bool, default=True, help="Output files will contain quality scores by default (fastq format). If set to false, output files will be in fasta format.")
+parser.add_argument('--use_quality', type=bool, default=True, help="(Currently unsupported) Output files will contain quality scores by default (fastq format). If set to false, output files will be in fasta format.")
 parser.add_argument('-l', '--read_length', type=int, required=False, help="Manually sets the length of reads (overrides length of reference file reads)")
 
 args = parser.parse_args()
