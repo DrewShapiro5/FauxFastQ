@@ -3,7 +3,7 @@ import random
 class FQEditor:
 
     def __init__(self, seed: int, file_forward, file_reverse, unidirectional: bool = False, file_mode: str = 'w', preserve_case: bool = False, use_random_bases: bool = False):
-        self._header_str = "@M0577{edit_len}:236:000000000-LKC5Y:1:1107:27241:{index} {dir}:N:0:GATCAGAT+TCCGCGAA"
+        self._header_str = "@M{edit_method}{edit_len}:236:000000000-LKC5Y:1:1107:27241:{index} {dir}:N:0:GATCAGAT+TCCGCGAA"
         self._random = random.Random()
         self._random.seed(seed)
         self._unidirectional = unidirectional
@@ -21,7 +21,8 @@ class FQEditor:
                             quality_reverse,
                             edit_func=lambda seq, idx, l: seq[:idx] + seq[idx + l:],
                             iter_len=len(sequence) - edit_len + 1,
-                            edit_len=edit_len)
+                            edit_len=edit_len,
+                            edit_method='del')
 
     # Creates fastq files with replacements for each base pair
     def create_simulated_fastqs_replacement(self, sequence, quality_forward, quality_reverse, edit_len):
@@ -30,7 +31,8 @@ class FQEditor:
                             quality_reverse,
                             edit_func=self.pair_swap,
                             iter_len=len(sequence) - edit_len + 1,
-                            edit_len=edit_len)
+                            edit_len=edit_len,
+                            edit_method='rep')
 
     # Creates fastq files with insertions between each pair of base pairs
     def create_simulated_fastqs_insertion(self, sequence, quality_forward, quality_reverse, edit_len):
@@ -39,10 +41,11 @@ class FQEditor:
                             quality_reverse,
                             edit_func=self.pair_insertion,
                             iter_len=len(sequence) + 1,
-                            edit_len=edit_len)
+                            edit_len=edit_len,
+                            edit_method='ins')
 
     def _process_edits(self, sequence, quality_forward, quality_reverse,
-                       edit_func, iter_len, edit_len=1):
+                       edit_func, iter_len, edit_method, edit_len=1):
         """
         Driver method for creating edited FASTQ files.
         Args:
@@ -61,8 +64,8 @@ class FQEditor:
 
         for index in range(iter_len):
             # Generate headers
-            header_forward = self._header_str.format(edit_len=edit_len, index=index + self._total_reads, dir=1)
-            header_reverse = self._header_str.format(edit_len=edit_len, index=index + self._total_reads, dir=2)
+            header_forward = self._header_str.format(edit_method=edit_method, edit_len=edit_len, index=index + self._total_reads, dir=1)
+            header_reverse = self._header_str.format(edit_method=edit_method, edit_len=edit_len, index=index + self._total_reads, dir=2)
 
             # Apply the edit
             edited_sequence = edit_func(sequence, index, edit_len)
@@ -83,6 +86,7 @@ class FQEditor:
         for f in output_files:
             print("{} edits written to file {}".format(iter_len, f.name))
             f.close()
+        print()
         self._total_reads += iter_len
 
     # Replaces the base pair at index 'index' with a random base pair

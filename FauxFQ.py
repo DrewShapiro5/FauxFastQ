@@ -15,7 +15,7 @@ parser.add_argument('-n', '--edit_length', type=int, default=1, help='Amount of 
 parser.add_argument('--unidirectional', action='store_true', help="Use unidirectional sequencing")
 parser.add_argument('--reference_forward', type=pathlib.Path, default=None, help="Path to forward reference fastq file (for quality score sampling)")
 parser.add_argument('--reference_reverse', type=pathlib.Path, default=None, help="Path to reverse reference fastq file (for quality score sampling)")
-parser.add_argument('-s', '--seed', type=int, help="Seed for random base generator")
+parser.add_argument('-s', '--seed', type=int, help="Seed for random bp generator")
 parser.add_argument('-d', '--deletion', action='store_true', help="Deletion mode")
 parser.add_argument('-i', '--insertion', action='store_true', help="Insertion mode")
 parser.add_argument('-r', '--replacement', action='store_true', help="Replacement mode")

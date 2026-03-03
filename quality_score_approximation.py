@@ -1,6 +1,5 @@
 import pyfastx
 import random
-import sys
 
 def get_average_quality(file_path, sample_size):
     fa = pyfastx.Fastq(file_path)
